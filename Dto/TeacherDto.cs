@@ -1,4 +1,4 @@
-﻿using SchoolApp.Models;
+using SchoolApp.Models;
 
 namespace SchoolApp.Dto
 {
@@ -6,7 +6,7 @@ namespace SchoolApp.Dto
     {
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public int Hours { get; set; }
     }

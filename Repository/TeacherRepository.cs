@@ -1,4 +1,4 @@
-﻿using SchoolApp.Interface;
+using SchoolApp.Interface;
 using SchoolApp.Models;
 using SchoolApp.Data;
 
@@ -10,7 +10,7 @@ namespace SchoolApp.Repository
 
         public TeacherRepository(DataContext context)
         {
-                _context = context;
+            _context = context;
         }
 
         public bool CreateTeacher(Teacher teacher)
@@ -25,7 +25,7 @@ namespace SchoolApp.Repository
             return Save();
         }
 
-        public ICollection<Student> GetStudentByTeacher(int teacherId)
+        public ICollection<Student> GetStudentsByTeacher(int teacherId)
         {
             return _context.TeacherStudents.Where(t => t.Teacher.Id == teacherId).Select(s => s.Student).ToList();
         }

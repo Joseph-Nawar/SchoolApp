@@ -1,4 +1,4 @@
-﻿namespace SchoolApp.Models
+namespace SchoolApp.Models
 {
     public class Student
     {
@@ -11,6 +11,5 @@
         public double GPA { get; set; }
 
         public ICollection<TeacherStudent> TeacherStudents { get; set; } = new List<TeacherStudent>();
-
     }
 }

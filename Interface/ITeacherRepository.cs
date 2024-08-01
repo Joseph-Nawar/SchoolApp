@@ -1,10 +1,10 @@
-﻿using SchoolApp.Models;
+using SchoolApp.Models;
 
 namespace SchoolApp.Interface
 {
     public interface ITeacherRepository
     {
-        ICollection<Teacher> GetTeachers(); 
+        ICollection<Teacher> GetTeachers();
 
         Teacher GetTeacher(int teacherId);
 
@@ -12,7 +12,7 @@ namespace SchoolApp.Interface
 
         ICollection<Teacher> GetTeacherByStudent(int studentId);
 
-        ICollection<Student> GetStudentByTeacher(int teacherId);
+        ICollection<Student> GetStudentsByTeacher(int teacherId);
 
         bool CreateTeacher(Teacher teacher);
 
@@ -21,6 +21,5 @@ namespace SchoolApp.Interface
         bool DeleteTeacher(Teacher teacher);
 
         bool Save();
-
     }
 }

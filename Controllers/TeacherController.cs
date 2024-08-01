@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SchoolApp.Models;
 using SchoolApp.Data;
 using SchoolApp.Repository;
@@ -13,11 +13,14 @@ namespace SchoolApp.Controllers
     public class TeacherController : Controller
     {
         private readonly ITeacherRepository _teacherRepository;
+        private readonly IStudentRepository _studentRepository;
+
         private readonly IMapper _mapper;
 
-        public TeacherController(ITeacherRepository teacherRepository, IMapper mapper)
+        public TeacherController(ITeacherRepository teacherRepository, IStudentRepository studentRepository, IMapper mapper)
         {
             _teacherRepository = teacherRepository;
+            _studentRepository = studentRepository;
             _mapper = mapper;
         }
 
@@ -38,18 +41,18 @@ namespace SchoolApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetTeacher(int teacherId)
         {
-            if(!_teacherRepository.TeacherExists(teacherId))
+            if (!_teacherRepository.TeacherExists(teacherId))
                 return NotFound();
 
             var teacher = _mapper.Map<TeacherDto>(_teacherRepository.GetTeacher(teacherId));
 
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return Ok(teacher);
         }
 
-        [HttpGet("{teacherId}/student")]
+        [HttpGet("GetStudentByTeacher/{teacherId}")]
         [ProducesResponseType(200, Type = typeof(Teacher))]
         [ProducesResponseType(400)]
         public IActionResult GetStudentByTeacher(int teacherId)
@@ -60,31 +63,48 @@ namespace SchoolApp.Controllers
             }
 
             var teacher = _mapper.Map<List<StudentDto>>(
-                _teacherRepository.GetStudentByTeacher(teacherId));
-            if(!ModelState.IsValid)
+                _teacherRepository.GetStudentsByTeacher(teacherId));
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(teacher);
+        }
+
+        [HttpGet("GetTeacherByStudent/{studentId}")]
+        [ProducesResponseType(200, Type = typeof(Teacher))]
+        [ProducesResponseType(400)]
+        public IActionResult GetTeacherByStudent(int studentId)
+        {
+            if (!_studentRepository.StudentExists(studentId))
+            {
+                return NotFound();
+            }
+
+            var student = _mapper.Map<List<StudentDto>>(
+                _teacherRepository.GetTeacherByStudent(studentId));
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(student);
         }
 
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateTeacher([FromBody] TeacherDto teacherCreate) 
+        public IActionResult CreateTeacher([FromBody] TeacherDto teacherCreate)
         {
-            if(teacherCreate == null)
+            if (teacherCreate == null)
                 return BadRequest(ModelState);
 
             var teachers = _teacherRepository.GetTeachers()
-                .Where(t => t.Name.Trim().ToUpper() == teacherCreate.Name.Trim().ToUpper())
+                .Where(t => t.Name?.Trim().ToUpper() == teacherCreate.Name?.Trim().ToUpper())
                 .FirstOrDefault();
-            
-            if(teachers != null)
+
+            if (teachers != null)
             {
                 ModelState.AddModelError(" ", "Teacher already exists");
                 return StatusCode(422, ModelState);
             }
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var teacherMap = _mapper.Map<Teacher>(teacherCreate);
@@ -104,13 +124,13 @@ namespace SchoolApp.Controllers
         [ProducesResponseType(404)]
         public IActionResult UpdateTeacher(int teacherId, [FromBody] TeacherDto updateTeacher)
         {
-            if(updateTeacher == null)
+            if (updateTeacher == null)
                 return BadRequest(ModelState);
 
-            if(teacherId != updateTeacher.Id)
+            if (teacherId != updateTeacher.Id)
                 return BadRequest(ModelState);
 
-            if(!_teacherRepository.TeacherExists(teacherId))
+            if (!_teacherRepository.TeacherExists(teacherId))
                 return NotFound();
 
             if (!ModelState.IsValid)
@@ -118,7 +138,7 @@ namespace SchoolApp.Controllers
 
             var teachMap = _mapper.Map<Teacher>(updateTeacher);
 
-            if(!_teacherRepository.UpdateTeacher(teachMap))
+            if (!_teacherRepository.UpdateTeacher(teachMap))
             {
                 ModelState.AddModelError(" ", "Something went wrong updating owner");
                 return StatusCode(500, ModelState);
@@ -134,7 +154,7 @@ namespace SchoolApp.Controllers
         public IActionResult DeleteTeacher(int teacherId)
         {
             if (!_teacherRepository.TeacherExists(teacherId))
-            { 
+            {
                 return NotFound();
             }
 
@@ -143,7 +163,7 @@ namespace SchoolApp.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if(!_teacherRepository.DeleteTeacher(teacherToDelete))
+            if (!_teacherRepository.DeleteTeacher(teacherToDelete))
             {
                 ModelState.AddModelError("", "Something went wrong deleting the teacher");
             }
