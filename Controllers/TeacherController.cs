@@ -52,6 +52,7 @@ namespace SchoolApp.Controllers
             return Ok(teacher);
         }
 
+        //move to student controller
         [HttpGet("GetStudentByTeacher/{teacherId}")]
         [ProducesResponseType(200, Type = typeof(Teacher))]
         [ProducesResponseType(400)]
@@ -91,31 +92,44 @@ namespace SchoolApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult CreateTeacher([FromBody] TeacherDto teacherCreate)
         {
-            if (teacherCreate == null)
-                return BadRequest(ModelState);
-
-            var teachers = _teacherRepository.GetTeachers()
-                .Where(t => t.Name?.Trim().ToUpper() == teacherCreate.Name?.Trim().ToUpper())
-                .FirstOrDefault();
-
-            if (teachers != null)
-            {
-                ModelState.AddModelError(" ", "Teacher already exists");
-                return StatusCode(422, ModelState);
-            }
-
+            // Check if the model state is valid
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var teacherMap = _mapper.Map<Teacher>(teacherCreate);
+            // Check if the incoming DTO is null
+            if (teacherCreate == null)
+                return BadRequest("Teacher data is null");
 
-            if (!_teacherRepository.CreateTeacher(teacherMap))
+            // Check if the teacher already exists
+            var existingTeacher = _teacherRepository.GetTeachers()
+                .FirstOrDefault(t => t.Name?.Trim().ToUpper() == teacherCreate.Name?.Trim().ToUpper());
+
+            if (existingTeacher != null)
             {
-                ModelState.AddModelError(" ", "Something went wrong while saving");
+                ModelState.AddModelError("", "Teacher already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            // Map the DTO to the entity
+            Teacher teacherMap;
+            try
+            {
+                teacherMap = _mapper.Map<Teacher>(teacherCreate);
+            }
+            catch (AutoMapperMappingException ex)
+            {
+                ModelState.AddModelError("", $"Mapping failed: {ex.Message}");
                 return StatusCode(500, ModelState);
             }
 
-            return Ok("Successfully created");
+            // Create the new teacher
+            if (!_teacherRepository.CreateTeacher(teacherMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving the teacher");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Teacher successfully created");
         }
 
         [HttpPut("{teacherId}")]

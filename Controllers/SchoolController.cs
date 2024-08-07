@@ -83,32 +83,46 @@ namespace SchoolApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult CreateSchool([FromBody] SchoolDto schoolCreate)
         {
-            if (schoolCreate == null)
+            // Check if the model is valid
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var school = _schoolRepository.GetSchools()
-                .Where(c => c.Name.Trim().ToUpper() == schoolCreate.Name.TrimEnd().ToUpper())
-                .FirstOrDefault();
+            // Check if the incoming DTO is null
+            if (schoolCreate == null)
+                return BadRequest("School data is null");
 
-            if (school != null)
+            // Check if the school already exists
+            var existingSchool = _schoolRepository.GetSchools()
+                .FirstOrDefault(c => c.Name.Trim().ToUpper() == schoolCreate.Name.Trim().ToUpper());
+
+            if (existingSchool != null)
             {
                 ModelState.AddModelError("", "School already exists");
                 return StatusCode(422, ModelState);
             }
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var schoolMap = _mapper.Map<School>(schoolCreate);
-
-            if (!_schoolRepository.CreateSchool(schoolMap))
+            // Map the DTO to the entity
+            School schoolMap;
+            try
             {
-                ModelState.AddModelError("", "Something went wrong");
+                schoolMap = _mapper.Map<School>(schoolCreate);
+            }
+            catch (AutoMapperMappingException ex)
+            {
+                ModelState.AddModelError("", $"Mapping failed: {ex.Message}");
                 return StatusCode(500, ModelState);
             }
 
-            return Ok("School is created Successfully");
+            // Create the new school
+            if (!_schoolRepository.CreateSchool(schoolMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while creating the school");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("School is created successfully");
         }
+
 
         [HttpPut("{schoolId}")]
         [ProducesResponseType(400)]

@@ -54,31 +54,44 @@ namespace SchoolApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult CreateStudent([FromBody] StudentDto studentCreate)
         {
-            if (studentCreate == null)
-                return BadRequest(ModelState);
-
-            var students = _studentRepository.GetStudents()
-                .Where(s => s.Name?.Trim().ToUpper() == studentCreate.Name?.Trim().ToUpper())
-                .FirstOrDefault();
-
-            if (students != null)
-            {
-                ModelState.AddModelError(" ", "Student already exists");
-                return StatusCode(422, ModelState);
-            }
-
+            // Check if the model state is valid
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var studentMap = _mapper.Map<Student>(studentCreate);
+            // Check if the incoming DTO is null
+            if (studentCreate == null)
+                return BadRequest("Student data is null");
 
-            if (!_studentRepository.CreateStudent(studentMap))
+            // Check if the student already exists
+            var existingStudent = _studentRepository.GetStudents()
+                .FirstOrDefault(s => s.Name?.Trim().ToUpper() == studentCreate.Name?.Trim().ToUpper());
+
+            if (existingStudent != null)
             {
-                ModelState.AddModelError(" ", "Something went wrong while saving");
+                ModelState.AddModelError("", "Student already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            // Map the DTO to the entity
+            Student studentMap;
+            try
+            {
+                studentMap = _mapper.Map<Student>(studentCreate);
+            }
+            catch (AutoMapperMappingException ex)
+            {
+                ModelState.AddModelError("", $"Mapping failed: {ex.Message}");
                 return StatusCode(500, ModelState);
             }
 
-            return Ok("Successfully created");
+            // Create the new student
+            if (!_studentRepository.CreateStudent(studentMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving the student");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Student successfully created");
         }
 
         [HttpPut("{studentId}")]
