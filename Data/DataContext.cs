@@ -18,6 +18,7 @@ namespace SchoolApp.Data
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<TeacherStudent> TeacherStudents { get; set; }
+        public DbSet<School> Schools { get; set; }
         
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
