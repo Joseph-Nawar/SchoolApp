@@ -17,6 +17,8 @@ builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 
 builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 
+builder.Services.AddScoped<ISchoolRepository, SchoolRepository>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
