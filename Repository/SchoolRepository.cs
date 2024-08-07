@@ -1,4 +1,4 @@
-﻿using SchoolApp.Interface;
+using SchoolApp.Interface;
 using SchoolApp.Models;
 using SchoolApp.Data;
 
@@ -7,13 +7,12 @@ namespace SchoolApp.Repository
     public class SchoolRepository : ISchoolRepository
     {
         private readonly DataContext _context;
-       
 
         public SchoolRepository(DataContext context)
         {
             _context = context;
-             
         }
+
         public bool SchoolExists(int id)
         {
             return _context.Schools.Any(c => c.Id == id);
@@ -41,7 +40,6 @@ namespace SchoolApp.Repository
             return _context.Schools.Where(c => c.Id == id).FirstOrDefault();
         }
 
-         
         public bool Save()
         {
             var saved = _context.SaveChanges();
@@ -54,26 +52,34 @@ namespace SchoolApp.Repository
             return Save();
         }
 
-
-
         public School GetSchoolByTeacher(int teacherId)
         {
-            return _context.Teachers.Where(t => t.Id == teacherId).Select(c => c.School).FirstOrDefault();
+            return _context.Teachers
+                           .Where(t => t.Id == teacherId)
+                           .Select(t => t.School)
+                           .FirstOrDefault();
         }
 
         public ICollection<Teacher> GetTeachersFromSchool(int schoolId)
         {
-            return _context.Teachers.Where(c => c.School.Id == schoolId).ToList();
+            return _context.Teachers
+                           .Where(t => t.SchoolId == schoolId)
+                           .ToList();
         }
+
         public School GetSchoolByStudent(int studentId)
         {
-            return _context.Students.Where(s => s.Id == studentId).Select(c => c.School).FirstOrDefault();
+            return _context.Students
+                           .Where(s => s.Id == studentId)
+                           .Select(s => s.School)
+                           .FirstOrDefault();
         }
 
         public ICollection<Student> GetStudentsFromSchool(int schoolId)
         {
-            return _context.Students.Where(c => c.School.Id == schoolId).ToList();
+            return _context.Students
+                           .Where(s => s.SchoolId == schoolId)
+                           .ToList();
         }
-
     }
 }
