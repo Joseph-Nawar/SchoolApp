@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SchoolApp.Models;
 using SchoolApp.Data;
 using SchoolApp.Repository;
@@ -50,7 +50,7 @@ namespace SchoolApp.Controllers
             return Ok(school);
         }
 
-        [HttpGet("/{teacherId}")]
+        [HttpGet("teacher/{teacherId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(200, Type = typeof(School))]
         public IActionResult GetSchoolByTeacher(int teacherId)
@@ -64,7 +64,7 @@ namespace SchoolApp.Controllers
             return Ok(school);
         }
 
-        [HttpGet("/{studentId}")]
+        [HttpGet("student/{studentId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(200, Type = typeof(School))]
         public IActionResult GetSchoolByStudent(int studentId)
@@ -77,7 +77,6 @@ namespace SchoolApp.Controllers
 
             return Ok(school);
         }
-
 
         [HttpPost]
         [ProducesResponseType(204)]
@@ -110,7 +109,6 @@ namespace SchoolApp.Controllers
 
             return Ok("School is created Successfully");
         }
-
 
         [HttpPut("{schoolId}")]
         [ProducesResponseType(400)]
@@ -162,6 +160,5 @@ namespace SchoolApp.Controllers
             }
             return NoContent();
         }
-
     }
 }
