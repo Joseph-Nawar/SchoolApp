@@ -123,7 +123,6 @@ namespace SchoolApp.Controllers
             return Ok("School is created successfully");
         }
 
-
         [HttpPut("{schoolId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]

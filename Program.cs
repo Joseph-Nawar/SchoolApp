@@ -4,6 +4,8 @@ using SchoolApp;
 using SchoolApp.Repository;
 using System.Text.Json.Serialization;
 using SchoolApp.Interface;
+using System.Reflection;
+using SchoolApp.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,9 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-
+builder.Services.AddAutoMapper(config =>
+{
+    config.AddProfile<MappingProfile>(); // Use the correct namespace here
+}, Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 
 builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
