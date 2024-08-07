@@ -17,15 +17,31 @@ namespace SchoolApp.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<TeacherStudent>()
-                    .HasKey(st => new { st.StudentId, st.TeacherId });
+                .HasKey(ts => new { ts.StudentId, ts.TeacherId });
+
             modelBuilder.Entity<TeacherStudent>()
-                    .HasOne(st => st.Student)
-                    .WithMany(s => s.TeacherStudents)
-                    .HasForeignKey(st => st.StudentId);
+                .HasOne(ts => ts.Student)
+                .WithMany(s => s.TeacherStudents)
+                .HasForeignKey(ts => ts.StudentId)
+                .OnDelete(DeleteBehavior.Restrict); // Avoid cascading delete
+
             modelBuilder.Entity<TeacherStudent>()
-                    .HasOne(st => st.Teacher)
-                    .WithMany(t => t.TeacherStudents)
-                    .HasForeignKey(st => st.TeacherId);
+                .HasOne(ts => ts.Teacher)
+                .WithMany(t => t.TeacherStudents)
+                .HasForeignKey(ts => ts.TeacherId)
+                .OnDelete(DeleteBehavior.Restrict); // Avoid cascading delete
+
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.School)
+                .WithMany(s => s.Students)
+                .HasForeignKey(s => s.SchoolId)
+                .OnDelete(DeleteBehavior.Cascade); // Apply cascading delete
+
+            modelBuilder.Entity<Teacher>()
+                .HasOne(t => t.School)
+                .WithMany(s => s.Teachers)
+                .HasForeignKey(t => t.SchoolId)
+                .OnDelete(DeleteBehavior.Cascade); // Apply cascading delete
         }
     }
 }
