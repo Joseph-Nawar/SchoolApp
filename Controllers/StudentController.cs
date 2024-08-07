@@ -77,6 +77,8 @@ namespace SchoolApp.Controllers
             try
             {
                 studentMap = _mapper.Map<Student>(studentCreate);
+                // Set default SchoolId
+                studentMap.SchoolId = 1; // Assuming School with Id = 1 exists
             }
             catch (AutoMapperMappingException ex)
             {

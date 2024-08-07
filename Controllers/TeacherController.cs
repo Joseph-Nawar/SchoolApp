@@ -115,6 +115,9 @@ namespace SchoolApp.Controllers
             try
             {
                 teacherMap = _mapper.Map<Teacher>(teacherCreate);
+
+                // Set default SchoolId
+                teacherMap.SchoolId = 1; // Assuming School with Id = 1 exists
             }
             catch (AutoMapperMappingException ex)
             {
@@ -131,6 +134,7 @@ namespace SchoolApp.Controllers
 
             return Ok("Teacher successfully created");
         }
+
 
         [HttpPut("{teacherId}")]
         [ProducesResponseType(400)]
