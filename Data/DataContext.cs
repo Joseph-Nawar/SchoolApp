@@ -1,25 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SchoolApp.Models;
 
 namespace SchoolApp.Data
 {
     public class DataContext : DbContext
     {
-        public DataContext(DbContextOptions<DataContext> options) : base(options) 
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
-
-        }
-
-        public DataContext() : base ()
-        {
-                
         }
 
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<TeacherStudent> TeacherStudents { get; set; }
         public DbSet<School> Schools { get; set; }
-        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,8 +26,6 @@ namespace SchoolApp.Data
                     .HasOne(st => st.Teacher)
                     .WithMany(t => t.TeacherStudents)
                     .HasForeignKey(st => st.TeacherId);
-
-       
         }
     }
 }
